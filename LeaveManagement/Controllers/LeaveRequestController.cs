@@ -62,23 +62,12 @@ namespace LeaveManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("LeaveRequestId,EmployeeId,LeaveStartDate,LeaveEndDate,ReasonForLeave")] LeaveRequest leaveRequest)
         {
-            /*
-            
-            LeaveRequest newLeaveRequest = new LeaveRequest
-            {
-                Employee = newEmployee,
-                EmployeeId = leaveRequest.EmployeeId,
-                LeaveStartDate = leaveRequest.LeaveStartDate,
-                LeaveEndDate = leaveRequest.LeaveEndDate,
-                ReasonForLeave = leaveRequest.ReasonForLeave,
-            };
-            */
 
-            //validations
+            #region Leave Request Rules
 
             var getEmployeeLeave = _context.LeaveRequest.Where(x => x.EmployeeId == leaveRequest.EmployeeId).ToList();
             var getEmployee = _context.Employee.FirstOrDefault(x => x.EmployeeId == leaveRequest.EmployeeId);
-            var getAllEmployeeInDepartment = _context.Employee.Where(x => x.Department == getEmployee.Department).ToList();
+            
 
             
             
@@ -174,10 +163,10 @@ namespace LeaveManagement.Controllers
                     return View(leaveRequest);
                 }
             }
-            
 
 
 
+            #endregion
 
 
             if (ModelState.IsValid)
@@ -278,5 +267,8 @@ namespace LeaveManagement.Controllers
         {
             return _context.LeaveRequest.Any(e => e.LeaveRequestId == id);
         }
+
+        
+
     }
 }

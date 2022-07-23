@@ -8,46 +8,83 @@
 
 <p>
     <a asp-action="Create">Create New</a>
+
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Employee)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LeaveStartDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LeaveEndDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReasonForLeave)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Employee.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LeaveStartDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LeaveEndDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReasonForLeave)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.LeaveRequestId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.LeaveRequestId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.LeaveRequestId">Delete</a>
-            </td>
-        </tr>
+<div class="col-md-4 text-right"> <button id="exporttable" class="btn btn-primary">Export</button> </div>
+
+    <table class="table" id="leave_request_table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Employee)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.LeaveStartDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.LeaveEndDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ReasonForLeave)
+                </th>
+                <th class="noExl"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Employee.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LeaveStartDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LeaveEndDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ReasonForLeave)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.LeaveRequestId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.LeaveRequestId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.LeaveRequestId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+@section scripts
+{
+    <script src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/jquery.table2excel.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#exporttable").click(function (e) {
+                var table = $("#leave_request_table");
+                if (table && table.length) {
+                    $(table).table2excel({
+                        exclude: ".noExl",
+                        name: "Excel Document Name",
+                        filename: "Employee Leave Request List" + new Date().toISOString().replace(/[\-\:\.]/g, "") + ".xls",
+                        fileext: ".xls",
+                        exclude_img: true,
+                        exclude_links: true,
+                        exclude_inputs: true,
+                        preserveColors: false
+                        
+                    });
+                }
+            });
+
+        });
+    </script>
+
 }
-    </tbody>
-</table>
+
+
+
+
+

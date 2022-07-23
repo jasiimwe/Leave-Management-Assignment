@@ -8,7 +8,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     //options.UseInMemoryDatabase("leave-maangement-in-memory");
-    options.UseSqlite("Filename=MyDatabase.db");
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 
 
 });
