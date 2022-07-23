@@ -91,7 +91,7 @@ namespace LeaveManagement.Controllers
 
             //StartDate and EndDate comparison
 
-            if (DateTime.Compare(startDate, endDate) > 0)
+            if(LeaveRequestValidation.IsDateGreaterThan(startDate, endDate))
             {
                 ModelState.AddModelError("", "Leave Start date cannot be greater than the leave end date");
                 ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
@@ -146,12 +146,13 @@ namespace LeaveManagement.Controllers
             var getLastEmployeeLeave = getEmployeeLeave.LastOrDefault();
             if(getLastEmployeeLeave != null)
             {
-                if ((getLastEmployeeLeave.LeaveEndDate - startDate).TotalDays < 30)
+                if (LeaveRequestValidation.IsLessThanMonth(getLastEmployeeLeave.LeaveEndDate, startDate))
                 {
                     ModelState.AddModelError("", "You can't make another Leave request");
                     ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
                     return View(leaveRequest);
                 }
+                
             }
             
             //validation managers take leave for 30 and others 21 days
