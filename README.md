@@ -31,7 +31,9 @@ This is Leave management system that enables an employee register their details 
        therefore, the system then checks the last leave request end date and subtracts the start date of the current leave request to get the number days which should be more than a month(30)<br>
   d)  Managers can take up to 30 days while all other staff can take up to 21 days; this assumes that employess have been categorised into manager and other staff. The system checks for the employee type<br />
       and for either type the system calculates the number of days between the start date and end date of leave request and compares against the specified days.<br />
-  e). 
+  e). Weekends should not be included when applying for leave. the assumption is the leave request start and end date can't fall on weekends. The system checks the leave request start and dates and to see of any of them fall on the weekends. 
+  4. The system lists all leave requests and provides an option to export the leave requests to excel. this is achieved using the jquery and bootstrap tables.
+
 
       
       
