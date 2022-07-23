@@ -8,9 +8,9 @@ namespace LeaveManagement.Controllers.Validations
 		}
 
 
-		public static bool HasOverlap(DateTime inputStartDate, DateTime savedStartDate, DateTime inputEndDate, DateTime savedEndDate)
+		public static bool HasOverlap(DateTime startDate1, DateTime endDate1, DateTime startDate2, DateTime endDate2)
 		{
-			return inputStartDate < savedEndDate && savedStartDate > inputEndDate;
+			return startDate1 < endDate2 && endDate1 > startDate2;
 		}
 	}
 }

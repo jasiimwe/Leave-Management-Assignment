@@ -111,24 +111,26 @@ namespace LeaveManagement.Controllers
             //Lookup overlapping dates
             foreach( var c in getEmployeeLeave)
             {
-                
-                if (startDate < c.LeaveEndDate && c.LeaveStartDate < endDate)
+
+                var isOverlap = LeaveRequestValidation.HasOverlap(c.LeaveStartDate, c.LeaveEndDate, startDate, endDate);
+
+                if (isOverlap)
                 {
                     ModelState.AddModelError("", "Leave dates are overlapping. please select other dates");
                     ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
                     return View(leaveRequest);
                 }
-                
+
                 
             }
 
             //Lookup overlapping dates with other employers in othe departments
             var getAllLeaveRequests = _context.LeaveRequest.Where(x=>x.Employee.Department == getEmployee.Department);
             foreach(var f in getAllLeaveRequests)
-            { 
+            {
+                var isOverlap =  LeaveRequestValidation.HasOverlap(f.LeaveStartDate, f.LeaveEndDate, startDate, endDate);
 
-                
-                if (startDate < f.LeaveEndDate && f.LeaveEndDate < endDate)
+                if (isOverlap)
                 {
                     ModelState.AddModelError("", "Leave dates are overlapping with other people in the department. please select other dates");
                     ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
