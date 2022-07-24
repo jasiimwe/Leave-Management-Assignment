@@ -133,7 +133,7 @@ namespace LeaveManagement.Controllers
             if(getLastEmployeeLeave != null)
             {
                 var lastDate = Convert.ToDateTime(getLastEmployeeLeave.LeaveEndDate);
-                var difference = startDate - lastDate;
+               
                 if (LeaveRequestValidation.IsLessThanMonth(startDate, lastDate))
                 {
                     ModelState.AddModelError("", "You can't make another Leave request");
