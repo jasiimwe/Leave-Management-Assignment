@@ -136,7 +136,7 @@ namespace LeaveManagement.Controllers
                
                 if (LeaveRequestValidation.IsLessThanMonth(startDate, lastDate))
                 {
-                    ModelState.AddModelError("", "You can't make another Leave request");
+                    ModelState.AddModelError("", "You can't make another leave request in the given period.");
                     ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
                     return View(leaveRequest);
                 }
