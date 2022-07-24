@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using LeaveManagement.Models;
 using LeaveManagement.Persistent;
 using LeaveManagement.Controllers.Validations;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace LeaveManagement.Controllers
 {
@@ -131,7 +132,9 @@ namespace LeaveManagement.Controllers
             var getLastEmployeeLeave = getEmployeeLeave.LastOrDefault();
             if(getLastEmployeeLeave != null)
             {
-                if (LeaveRequestValidation.IsLessThanMonth(getLastEmployeeLeave.LeaveEndDate, startDate))
+                var lastDate = Convert.ToDateTime(getLastEmployeeLeave.LeaveEndDate);
+                var difference = startDate - lastDate;
+                if (LeaveRequestValidation.IsLessThanMonth(startDate, lastDate))
                 {
                     ModelState.AddModelError("", "You can't make another Leave request");
                     ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);

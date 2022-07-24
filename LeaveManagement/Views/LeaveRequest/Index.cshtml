@@ -1,16 +1,16 @@
 ﻿@model IEnumerable<LeaveManagement.Models.LeaveRequest>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "All Leave Requests";
 }
 
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">New Leave Request</a>
 
 </p>
-<div class="col-md-4 text-right"> <button id="exporttable" class="btn btn-primary">Export</button> </div>
+<div class="col-md-4 text-right"> <button id="exporttable" class="btn btn-primary">Export Excel</button> </div>
 
     <table class="table" id="leave_request_table">
         <thead>
@@ -46,7 +46,7 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.ReasonForLeave)
                     </td>
-                    <td>
+                    <td class="noExl">
                         <a asp-action="Edit" asp-route-id="@item.LeaveRequestId">Edit</a> |
                         <a asp-action="Details" asp-route-id="@item.LeaveRequestId">Details</a> |
                         <a asp-action="Delete" asp-route-id="@item.LeaveRequestId">Delete</a>

@@ -59,11 +59,33 @@ namespace LeaveManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EmployeeId,FirstName,LastName,Department,DateOfBirth,EmployeeType")] Employee employee)
         {
-            if (EmployeeValidation.CheckDateOfBirth(employee.DateOfBirth))
+
+
+            #region Validation Rules
+            //check if employee already exists
+            var getEmployee = _context.Employee.FirstOrDefault(e => e.FirstName == employee.FirstName && e.LastName == employee.LastName);
+            if (getEmployee != null)
             {
-                ModelState.AddModelError("", "Invalid Birth date; Date of birth is in future");
+                ModelState.AddModelError("", "Employee already exists");
                 return View(employee);
             }
+
+            //check if dob is in the future
+            if (EmployeeValidation.CheckDateOfBirth(employee.DateOfBirth))
+            {
+                ModelState.AddModelError("", "Invalid Birth date; Date of is in future or less than 18");
+                return View(employee);
+            }
+
+            /*
+            //check if age is less than 18
+            if (EmployeeValidation.GreaterThan18(employee.DateOfBirth))
+            {
+                ModelState.AddModelError("", "You are to young");
+                return View(employee);
+            }
+            */
+            #endregion
 
             if (ModelState.IsValid)
             {

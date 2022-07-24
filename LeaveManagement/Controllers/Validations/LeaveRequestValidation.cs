@@ -20,9 +20,9 @@ namespace LeaveManagement.Controllers.Validations
 			return startDate1 < endDate2 && endDate1 > startDate2;
 		}
 
-		public static bool IsLessThanMonth(DateTime endDate, DateTime startDate)
+		public static bool IsLessThanMonth(DateTime startDate, DateTime endDate)
         {
-			return (endDate - startDate).TotalDays < 30;
+			return (startDate - endDate).TotalDays < 30;
         }
 		
 	}
