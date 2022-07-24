@@ -10,7 +10,6 @@ This is Leave management system that enables an employee register their details 
 1. Clone Repo to a specified folder on your computer
 2. Open project in visual studio or visual studio code(make sure to have installed c# extension and dotnet)
 3. Navigate to appsettings.json and update the DefaultConnect i.e. this project uses sqlite database
-4. Open you Package Console Manager and run migrations "Add-Migration {InitialCreate}" or on your command line navigate to the project main folder and run "dotnet ef migrations add {MigrationName}"
 4. Open you Package Console Manager and run "Update-Database" or on your command line navigate to the project main folder and run "dotnet ef database update" to update your database
 5. Run the project
 6. viola!!!
@@ -33,7 +32,7 @@ This is Leave management system that enables an employee register their details 
   d)  Managers can take up to 30 days while all other staff can take up to 21 days; this assumes that employess have been categorised into manager and other staff. The system checks for the employee type<br />
       and for either type the system calculates the number of days between the start date and end date of leave request and compares against the specified days.<br />
   e). Weekends should not be included when applying for leave. the assumption is the leave request start and end date can't fall on weekends. The system checks the leave request start and dates and to see of any of them fall on the weekends. <br />
-  4. The system lists all leave requests and provides an option to export the leave requests to excel. this is achieved using the jquery and bootstrap tables.
+  4. The system lists all leave requests and provides an option to export the leave requests to excel. This is achieved using the jquery and bootstrap tables.
   
 
 
