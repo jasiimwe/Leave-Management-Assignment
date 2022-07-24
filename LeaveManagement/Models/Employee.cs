@@ -28,6 +28,7 @@ namespace LeaveManagement.Models
         [Required]
         [Column(TypeName = "date")]
         [DisplayName("Date of Birth")]
+        [DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
 
         [Required]

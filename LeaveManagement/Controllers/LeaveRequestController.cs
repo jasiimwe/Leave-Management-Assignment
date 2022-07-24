@@ -68,10 +68,6 @@ namespace LeaveManagement.Controllers
             var getEmployeeLeave = _context.LeaveRequest.Where(x => x.EmployeeId == leaveRequest.EmployeeId).ToList();
             var getEmployee = _context.Employee.FirstOrDefault(x => x.EmployeeId == leaveRequest.EmployeeId);
             
-
-            
-            
-
             var startDate = Convert.ToDateTime(leaveRequest.LeaveStartDate);
             var endDate = Convert.ToDateTime(leaveRequest.LeaveEndDate);
             var managerLeaveDays = 30;

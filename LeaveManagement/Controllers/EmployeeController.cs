@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeaveManagement.Models;
 using LeaveManagement.Persistent;
+using LeaveManagement.Controllers.Validations;
 
 namespace LeaveManagement.Controllers
 {
@@ -58,6 +59,12 @@ namespace LeaveManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EmployeeId,FirstName,LastName,Department,DateOfBirth,EmployeeType")] Employee employee)
         {
+            if (EmployeeValidation.CheckDateOfBirth(employee.DateOfBirth))
+            {
+                ModelState.AddModelError("", "Invalid Birth date; Date of birth is in future");
+                return View(employee);
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(employee);

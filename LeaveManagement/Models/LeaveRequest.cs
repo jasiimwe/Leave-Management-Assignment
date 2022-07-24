@@ -15,10 +15,12 @@ namespace LeaveManagement.Models
 		public virtual Employee? Employee { get; set; }
 
         [Column(TypeName = "date")]
-		public DateTime LeaveStartDate { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime LeaveStartDate { get; set; }
 
 		[Column(TypeName = "date")]
-		public DateTime LeaveEndDate { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime LeaveEndDate { get; set; }
 
 		[Required]
 		[Column(TypeName = "nvarchar(255)")]
