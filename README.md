@@ -4,7 +4,8 @@ This is Leave management system that enables an employee register their details 
 1. Developed in Visual Studio Preview macos
 2. Developed Using Asp.Net Core 6 and c#
 3. It uses Entity Framework Core for handling storage and related operations.
-4. Applies code-first
+4. Applies code-first and dependency injection
+5. Uses the MVC framework pattern
 # How to Install Locally
 1. Clone Repo to a specified folder on your computer
 2. Open project in visual studio or visual studio code(make sure to have installed c# extension and dotnet)
@@ -33,6 +34,8 @@ This is Leave management system that enables an employee register their details 
       and for either type the system calculates the number of days between the start date and end date of leave request and compares against the specified days.<br />
   e). Weekends should not be included when applying for leave. the assumption is the leave request start and end date can't fall on weekends. The system checks the leave request start and dates and to see of any of them fall on the weekends. <br />
   4. The system lists all leave requests and provides an option to export the leave requests to excel. this is achieved using the jquery and bootstrap tables.
+  
+
 
 
       
