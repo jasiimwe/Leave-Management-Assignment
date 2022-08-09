@@ -1,13 +1,13 @@
 @model IEnumerable<LeaveManagement.Models.Employee>
 
 @{
-    ViewData["Title"] = "All Employees";
+    ViewData["Title"] = "Index";
 }
 
-<h1>All Employess</h1>
+<h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New Employee</a>
+    <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <thead>
@@ -40,13 +40,13 @@
                 @Html.DisplayFor(modelItem => item.LastName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Department)
+                @Html.DisplayFor(modelItem => item.Department.DepartmentId)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.DateOfBirth)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.EmployeeType)
+                @Html.DisplayFor(modelItem => item.EmployeeType.EmployeeTypeId)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.EmployeeId">Edit</a> |

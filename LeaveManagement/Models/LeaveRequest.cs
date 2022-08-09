@@ -24,7 +24,7 @@ namespace LeaveManagement.Models
 
 		[Required]
 		[Column(TypeName = "nvarchar(255)")]
-		public string ReasonForLeave { get; set; }
+		public string? ReasonForLeave { get; set; }
 
 
         

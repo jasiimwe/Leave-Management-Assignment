@@ -10,23 +10,26 @@ using LeaveManagement.Models;
 using LeaveManagement.Persistent;
 using LeaveManagement.Controllers.Validations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using LeaveManagement.Interfaces.Services;
+using LeaveManagement.Interfaces;
 
 namespace LeaveManagement.Controllers
 {
     public class LeaveRequestController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ILeaveRequestService _leaveRequestService;
 
-        public LeaveRequestController(AppDbContext context)
+        public LeaveRequestController(ILeaveRequestService leaveRequest, IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
+            _leaveRequestService = leaveRequest;
         }
 
         // GET: LeaveRequest
         public async Task<IActionResult> Index()
         {
-            var appDbContext = _context.LeaveRequest.Include(l => l.Employee);
-            return View(await appDbContext.ToListAsync());
+            return View(await _leaveRequestService.ListAsync());
         }
 
         // GET: LeaveRequest/Details/5
@@ -37,9 +40,7 @@ namespace LeaveManagement.Controllers
                 return NotFound();
             }
 
-            var leaveRequest = await _context.LeaveRequest
-                .Include(l => l.Employee)
-                .FirstOrDefaultAsync(m => m.LeaveRequestId == id);
+            var leaveRequest = await _leaveRequestService.ListById((int)id);
             if (leaveRequest == null)
             {
                 return NotFound();
@@ -52,7 +53,7 @@ namespace LeaveManagement.Controllers
         // GET: LeaveRequest/Create
         public IActionResult Create()
         {
-            ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName");
+            PopulateEmployee();
             return View();
         }
 
@@ -64,118 +65,18 @@ namespace LeaveManagement.Controllers
         public async Task<IActionResult> Create([Bind("LeaveRequestId,EmployeeId,LeaveStartDate,LeaveEndDate,ReasonForLeave")] LeaveRequest leaveRequest)
         {
 
-            #region Leave Request Rules
-
-            var getEmployeeLeave = _context.LeaveRequest.Where(x => x.EmployeeId == leaveRequest.EmployeeId).ToList();
-            var getEmployee = _context.Employee.FirstOrDefault(x => x.EmployeeId == leaveRequest.EmployeeId);
-            
-            var startDate = Convert.ToDateTime(leaveRequest.LeaveStartDate);
-            var endDate = Convert.ToDateTime(leaveRequest.LeaveEndDate);
-            var managerLeaveDays = 30;
-            var otherStaffLeaveDays = 20;
-            var daysRequested = (int)(endDate - startDate).TotalDays;
-
-            //StartDate and EndDate comparison
-
-            if(LeaveRequestValidation.IsDateGreaterThan(startDate, endDate))
-            {
-                ModelState.AddModelError("", "Leave Start date cannot be greater than the leave end date");
-                ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
-                return View(leaveRequest);
-            }
-
-            //weekend validation
-            if((startDate.DayOfWeek == DayOfWeek.Saturday || startDate.DayOfWeek == DayOfWeek.Sunday) || (endDate.DayOfWeek == DayOfWeek.Saturday || endDate.DayOfWeek == DayOfWeek.Sunday))
-            {
-                ModelState.AddModelError("", "Leave Start date and end Date can't fall on Weekends");
-                ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
-                return View(leaveRequest);
-            }
-
-            
-
-            //Lookup overlapping dates
-            foreach( var c in getEmployeeLeave)
-            {
-
-                var isOverlap = LeaveRequestValidation.HasOverlap(c.LeaveStartDate, c.LeaveEndDate, startDate, endDate);
-
-                if (isOverlap)
-                {
-                    ModelState.AddModelError("", "Leave dates are overlapping. please select other dates");
-                    ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
-                    return View(leaveRequest);
-                }
-
-                
-            }
-
-            //Lookup overlapping dates with other employers in othe departments
-            var getAllLeaveRequests = _context.LeaveRequest.Where(x=>x.Employee.Department == getEmployee.Department);
-            foreach(var f in getAllLeaveRequests)
-            {
-                var isOverlap =  LeaveRequestValidation.HasOverlap(f.LeaveStartDate, f.LeaveEndDate, startDate, endDate);
-
-                if (isOverlap)
-                {
-                    ModelState.AddModelError("", "Leave dates are overlapping with other people in the department. please select other dates");
-                    ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
-                    return View(leaveRequest);
-                }
-                
-            }
-
-
-
-
-            //Lookup last leave request to be less than 30 days
-            var getLastEmployeeLeave = getEmployeeLeave.LastOrDefault();
-            if(getLastEmployeeLeave != null)
-            {
-                var lastDate = Convert.ToDateTime(getLastEmployeeLeave.LeaveEndDate);
-               
-                if (LeaveRequestValidation.IsLessThanMonth(startDate, lastDate))
-                {
-                    ModelState.AddModelError("", "You can't make another leave request in the given period.");
-                    ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
-                    return View(leaveRequest);
-                }
-                
-            }
-            
-            //validation managers take leave for 30 and others 21 days
-            if(getEmployee.EmployeeType == Employee.EmployeeTypeChoices.Managers)
-            {
-                if(daysRequested > managerLeaveDays)
-                {
-                    ModelState.AddModelError("", "Leave request denied becuase you are over the limit (30 days for a manager)");
-                    ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
-                    return View(leaveRequest);
-                }
-            }
-            else
-            {
-                if (daysRequested > otherStaffLeaveDays)
-                {
-                    ModelState.AddModelError("", "Leave request denied becuase you are over the limit (21 days for other staff)");
-                    ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
-                    return View(leaveRequest);
-                }
-            }
-
-
-
-            #endregion
-
-
             if (ModelState.IsValid)
             {
-                
-                _context.LeaveRequest.Add(leaveRequest);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                var result = await _leaveRequestService.SaveAsync(leaveRequest);
+                if(result.Success)
+                    return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", result.Message);
+                PopulateEmployee();
+                return View();
+
+
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "FirstName", leaveRequest.EmployeeId);
             return View(leaveRequest);
         }
 
@@ -187,12 +88,12 @@ namespace LeaveManagement.Controllers
                 return NotFound();
             }
 
-            var leaveRequest = await _context.LeaveRequest.FindAsync(id);
+            var leaveRequest = await _leaveRequestService.ListById((int)id);
             if (leaveRequest == null)
             {
                 return NotFound();
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "Department", leaveRequest.EmployeeId);
+            PopulateEmployee();
             return View(leaveRequest);
         }
 
@@ -210,25 +111,15 @@ namespace LeaveManagement.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(leaveRequest);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LeaveRequestExists(leaveRequest.LeaveRequestId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                var result = await _leaveRequestService.UpdateAsync(id, leaveRequest);
+                if (result.Success)
+                    return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", result.Message);
+                PopulateEmployee();
+                return View();
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employee, "EmployeeId", "Department", leaveRequest.EmployeeId);
+
+            PopulateEmployee();
             return View(leaveRequest);
         }
 
@@ -240,9 +131,7 @@ namespace LeaveManagement.Controllers
                 return NotFound();
             }
 
-            var leaveRequest = await _context.LeaveRequest
-                .Include(l => l.Employee)
-                .FirstOrDefaultAsync(m => m.LeaveRequestId == id);
+            var leaveRequest = await _leaveRequestService.ListById((int)id);
             if (leaveRequest == null)
             {
                 return NotFound();
@@ -256,18 +145,22 @@ namespace LeaveManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var leaveRequest = await _context.LeaveRequest.FindAsync(id);
-            _context.LeaveRequest.Remove(leaveRequest);
-            await _context.SaveChangesAsync();
+            var leaveRequest = await _leaveRequestService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool LeaveRequestExists(int id)
+
+        public async void PopulateEmployee()
         {
-            return _context.LeaveRequest.Any(e => e.LeaveRequestId == id);
+            var EmployeeCollection = await _unitOfWork.EmployeeRepository.GetAll();
+            ViewBag.Employee = EmployeeCollection.Select(item => new SelectListItem
+            {
+                Text = item.FirstName,
+                Value = item.EmployeeId.ToString()
+            });
         }
 
-        
 
     }
+        
 }

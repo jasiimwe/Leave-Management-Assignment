@@ -21,9 +21,9 @@ namespace LeaveManagement.Models
         public string LastName { get; set; }
 
         [Required]
-        [Column(TypeName = "nvarchar(100)")]
         [DisplayName("Department")]
-        public string Department { get; set; }
+        public int DepartmentId { get; set; }
+        public Department? Department { get; set; }
 
         [Required]
         [Column(TypeName = "date")]
@@ -32,20 +32,11 @@ namespace LeaveManagement.Models
         public DateTime DateOfBirth { get; set; }
 
         [Required]
-        [Column(TypeName = "nvarchar(100)")]
         [DisplayName("Employee Type")]
-        [EnumDataType(typeof(EmployeeTypeChoices))]
-        public EmployeeTypeChoices EmployeeType { get; set; }
+        public int EmployeeTypeId { get; set; }
+        public EmployeeType? EmployeeType { get; set; }
 
-        public virtual List<LeaveRequest>? LeaveRequests { get; set; }
-
-
-        public enum EmployeeTypeChoices
-        {
-            Managers= 1,
-            OtherStaff = 2
-         
-        }
+        
 
         
  

@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,24 +8,39 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeaveManagement.Models;
 using LeaveManagement.Persistent;
-using LeaveManagement.Controllers.Validations;
+using LeaveManagement.Models.Repository;
+using LeaveManagement.Interfaces;
+using LeaveManagement.Interfaces.Services;
+using LeaveManagement.Services;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace LeaveManagement.Controllers
 {
     public class EmployeeController : Controller
     {
-        private readonly AppDbContext _context;
+        
+        private readonly IEmployeeService _employeeService;
+        //private readonly IDepartmentService _departmentService;
+        //private readonly IEmployeeTypeService _employeeTypeService;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IRepository<Employee, int> _employeeRepository;
+        private readonly ModelStateDictionary _modelStateDictionery;
 
-        public EmployeeController(AppDbContext context)
+        
+
+        public EmployeeController(IEmployeeService employeeService, IUnitOfWork unitOfWork)
         {
-            _context = context;
+
+            _employeeService = employeeService;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: Employee
         public async Task<IActionResult> Index()
         {
+
+            return View(await _employeeService.ListAsync());
             
-            return View(await _context.Employee.ToListAsync());
         }
 
         // GET: Employee/Details/5
@@ -36,8 +51,7 @@ namespace LeaveManagement.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employee
-                .FirstOrDefaultAsync(m => m.EmployeeId == id);
+            var employee = await _unitOfWork.EmployeeRepository.GetById((int)id);
             if (employee == null)
             {
                 return NotFound();
@@ -49,6 +63,10 @@ namespace LeaveManagement.Controllers
         // GET: Employee/Create
         public IActionResult Create()
         {
+
+            PopulateDepartment();
+            PopulateEmployeeType();
+            
             return View();
         }
 
@@ -57,95 +75,25 @@ namespace LeaveManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EmployeeId,FirstName,LastName,Department,DateOfBirth,EmployeeType")] Employee employee)
+        public async Task<IActionResult> Create([Bind("EmployeeId,FirstName,LastName,DepartmentId,DateOfBirth,EmployeeTypeId")] Employee employee)
         {
+             if (ModelState.IsValid)
+             {
+                var result = await _employeeService.SaveAsync(employee);
+                if (result.Success)
+                    return RedirectToAction(nameof(Index));
 
-
-            #region Validation Rules
-            //check if employee already exists
-            var getEmployee = _context.Employee.FirstOrDefault(e => e.FirstName == employee.FirstName && e.LastName == employee.LastName);
-            if (getEmployee != null)
-            {
-                ModelState.AddModelError("", "Employee already exists");
-                return View(employee);
-            }
-
-            //check if dob is in the future
-            if (EmployeeValidation.CheckDateOfBirth(employee.DateOfBirth))
-            {
-                ModelState.AddModelError("", "Invalid Birth date; Date of is in future or less than 18");
-                return View(employee);
-            }
-
-            /*
-            //check if age is less than 18
-            if (EmployeeValidation.GreaterThan18(employee.DateOfBirth))
-            {
-                ModelState.AddModelError("", "You are to young");
-                return View(employee);
-            }
-            */
-            #endregion
-
-            if (ModelState.IsValid)
-            {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", result.Message);
+                PopulateDepartment();
+                PopulateEmployeeType();
+                return View();
+                
             }
             return View(employee);
         }
 
-        // GET: Employee/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        
 
-            var employee = await _context.Employee.FindAsync(id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-            return View(employee);
-        }
-
-        // POST: Employee/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,FirstName,LastName,Department,DateOfBirth,EmployeeType")] Employee employee)
-        {
-            if (id != employee.EmployeeId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EmployeeExists(employee.EmployeeId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(employee);
-        }
 
         // GET: Employee/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -155,9 +103,8 @@ namespace LeaveManagement.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employee
-                .FirstOrDefaultAsync(m => m.EmployeeId == id);
-            if (employee == null)
+            var employee = await _employeeService.ListById((int)id);
+            if(employee == null)
             {
                 return NotFound();
             }
@@ -170,15 +117,26 @@ namespace LeaveManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var employee = await _context.Employee.FindAsync(id);
-            _context.Employee.Remove(employee);
-            await _context.SaveChangesAsync();
+            await _employeeService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool EmployeeExists(int id)
+        
+
+        [NonAction]
+        public async void PopulateDepartment()
         {
-            return _context.Employee.Any(e => e.EmployeeId == id);
+            var DepartmentCollection = await _unitOfWork.DepartmentRepositoty.GetAll();
+            ViewBag.Department = DepartmentCollection.Select(item => new SelectListItem { Text = item.DepartmentName,
+            Value = item.DepartmentId.ToString() });
+        }
+
+        [NonAction]
+        public async void PopulateEmployeeType()
+        {
+            var employeeType = await _unitOfWork.EmployeeTypeRepository.GetAll();
+            ViewBag.EmployeeType = employeeType.Select(item => new SelectListItem { Text = item.EmployeeTypeName,
+                Value = item.EmployeeTypeId.ToString()});
         }
     }
 }
