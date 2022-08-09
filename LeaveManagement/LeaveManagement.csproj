@@ -21,7 +21,6 @@
     <None Remove="Controllers\Validations\" />
     <None Remove="System.Configuration.ConfigurationManager" />
     <None Remove="Models\Repository\" />
-    <None Remove="Utils\" />
     <None Remove="Services\" />
     <None Remove="Interfaces\" />
     <None Remove="Interfaces\Services\" />
@@ -36,7 +35,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.4" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
   </ItemGroup>
@@ -44,7 +43,6 @@
     <Folder Include="Persistent\" />
     <Folder Include="Controllers\Validations\" />
     <Folder Include="Models\Repository\" />
-    <Folder Include="Utils\" />
     <Folder Include="Services\" />
     <Folder Include="Interfaces\" />
     <Folder Include="Interfaces\Services\" />

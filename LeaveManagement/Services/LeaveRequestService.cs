@@ -14,6 +14,8 @@ namespace LeaveManagement.Services
     public class LeaveRequestService : ILeaveRequestService
     {
         private readonly IUnitOfWork _unitOfWork;
+
+        Messages message = new Messages();
         
 
         public LeaveRequestService(IUnitOfWork unitOfWork)
@@ -108,6 +110,7 @@ namespace LeaveManagement.Services
             var existingLeaveRequest = await _unitOfWork.LeaveRepository.GetById(id);
             if (existingLeaveRequest == null)
                 return new LeaveRequestResponse("Leave Request doesn't exist");
+            
 
             try
             {
@@ -140,19 +143,19 @@ namespace LeaveManagement.Services
             
 
             if (!StartDateNotLessThanEndDate(leaveRequest))
-                return new LeaveRequestResponse("Start Date can't be greater than end date");
+                return new LeaveRequestResponse(message.startDateNotLessThanEndDateErrorMessage);
 
             if (!await LeaveRequestHasOverlapAsync(leaveRequest))
-                return new LeaveRequestResponse("Leave Request has Overlapping Dates");
+                return new LeaveRequestResponse(message.leaveRequestHasOverlapAsyncErrorMessagae);
 
             if (!await LeaveRequestHasOverlapInDepartmentAsync(leaveRequest))
-                return new LeaveRequestResponse("Your Leave Request Overlaps with another member in your Department");
+                return new LeaveRequestResponse(message.leaveRequestHasOverlapInDepartmentAsyncErrorMessage);
 
             if (!await CheckLastLeaveLessThanThirtyDays(leaveRequest))
-                return new LeaveRequestResponse("You can't make another leave request in the given period.");
+                return new LeaveRequestResponse(message.checkLastLeaveLessThanThirtyDaysErorrMessage);
 
             if (!await CheckLeaveDays(leaveRequest))
-                return new LeaveRequestResponse("Please Revise the period for your leave Request");
+                return new LeaveRequestResponse(message.checkLeaveDaysErrorMessage);
 
             
 
