@@ -8,7 +8,9 @@ namespace LeaveManagement.Communication
         public String leaveRequestHasOverlapInDepartmentAsyncErrorMessage = "Your Leave Request Overlaps with another member in your Department";
         public String checkLastLeaveLessThanThirtyDaysErorrMessage = "You can't make another leave request in the given period";
         public String checkLeaveDaysErrorMessage = "Please Revise the period for your leave Request";
-        
+        public String checkDateOfBirthErrorMessage = "Date of Birth can't be in the future or below 18 years";
+
+
     }
 }
 

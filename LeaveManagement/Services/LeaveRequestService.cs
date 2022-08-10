@@ -117,7 +117,7 @@ namespace LeaveManagement.Services
                 await _unitOfWork.LeaveRepository.Delete(id);
                 await _unitOfWork.SaveAsync();
 
-                return new LeaveRequestResponse(existingLeaveRequest);
+                return new LeaveRequestResponse("Successfully deleted Leave Request");
             }
             catch (Exception ex)
             {
@@ -176,6 +176,23 @@ namespace LeaveManagement.Services
             var existingLeaveRequest = await _unitOfWork.LeaveRepository.GetById(id);
             if (existingLeaveRequest == null)
                 return new LeaveRequestResponse("Leave Request doesn't exist");
+
+
+            if (!StartDateNotLessThanEndDate(leaveRequest))
+                return new LeaveRequestResponse(message.startDateNotLessThanEndDateErrorMessage);
+
+            if (!await LeaveRequestHasOverlapAsync(leaveRequest))
+                return new LeaveRequestResponse(message.leaveRequestHasOverlapAsyncErrorMessagae);
+
+            if (!await LeaveRequestHasOverlapInDepartmentAsync(leaveRequest))
+                return new LeaveRequestResponse(message.leaveRequestHasOverlapInDepartmentAsyncErrorMessage);
+
+            if (!await CheckLastLeaveLessThanThirtyDays(leaveRequest))
+                return new LeaveRequestResponse(message.checkLastLeaveLessThanThirtyDaysErorrMessage);
+
+            if (!await CheckLeaveDays(leaveRequest))
+                return new LeaveRequestResponse(message.checkLeaveDaysErrorMessage);
+
 
             try
             {

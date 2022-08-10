@@ -1,7 +1,7 @@
 ﻿using System;
 using LeaveManagement.Controllers.Validations;
 using LeaveManagement.Persistent;
-using LeaveManagement.Utils;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace LeaveManagement.Models.Repository

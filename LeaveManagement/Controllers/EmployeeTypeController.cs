@@ -10,22 +10,23 @@ using LeaveManagement.Models;
 using LeaveManagement.Persistent;
 using LeaveManagement.Models.Repository;
 using LeaveManagement.Interfaces;
+using LeaveManagement.Interfaces.Services;
 
 namespace LeaveManagement.Controllers
 {
     public class EmployeeTypeController : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IEmployeeTypeService _employeeTypeService;
 
-        public EmployeeTypeController(IUnitOfWork unitOfWork)
+        public EmployeeTypeController(IEmployeeTypeService employeeTypeService)
         {
-            _unitOfWork = unitOfWork;
+            _employeeTypeService = employeeTypeService;
         }
 
         // GET: EmployeeType
         public async Task<IActionResult> Index()
         {
-            return View(await _unitOfWork.EmployeeTypeRepository.GetAll());
+            return View(await _employeeTypeService.ListAsync());
         }
 
         // GET: EmployeeType/Details/5
@@ -36,7 +37,7 @@ namespace LeaveManagement.Controllers
                 return NotFound();
             }
 
-            var employeeType = await _unitOfWork.EmployeeTypeRepository.GetById((int)id);
+            var employeeType = await _employeeTypeService.ListById((int)id);
             if (employeeType == null)
             {
                 return NotFound();
@@ -60,9 +61,12 @@ namespace LeaveManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _unitOfWork.EmployeeTypeRepository.Insert(employeeType);
-                await _unitOfWork.SaveAsync();
-                return RedirectToAction(nameof(Index));
+                var result = await _employeeTypeService.SaveAsync(employeeType);
+                if (result.Success)
+                    return RedirectToAction(nameof(Index));
+
+                ModelState.AddModelError("", result.Message);
+                return View();
             }
             return View(employeeType);
         }
@@ -75,7 +79,7 @@ namespace LeaveManagement.Controllers
                 return NotFound();
             }
 
-            var employeeType = await _unitOfWork.EmployeeTypeRepository.GetById((int)id);
+            var employeeType = await _employeeTypeService.ListById((int)id);
             if (employeeType == null)
             {
                 return NotFound();
@@ -92,7 +96,7 @@ namespace LeaveManagement.Controllers
                 return NotFound();
             }
 
-            var employeeType = await _unitOfWork.EmployeeTypeRepository.GetById((int)id);
+            var employeeType = await _employeeTypeService.ListById((int)id);
             if (employeeType == null)
             {
                 return NotFound();
@@ -107,8 +111,8 @@ namespace LeaveManagement.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             
-            await _unitOfWork.EmployeeTypeRepository.Delete((int)id);
-            await _unitOfWork.SaveAsync();
+            await _employeeTypeService.DeleteAsync((int)id);
+           
             return RedirectToAction(nameof(Index));
         }
 

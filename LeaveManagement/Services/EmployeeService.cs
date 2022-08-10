@@ -15,6 +15,7 @@ namespace LeaveManagement.Services
     {
         
         private readonly IUnitOfWork _unitOfWork;
+        Messages messages = new Messages();
         
 
         public EmployeeService(IUnitOfWork unitOfWork)
@@ -45,7 +46,7 @@ namespace LeaveManagement.Services
         public async Task<EmployeeResponse> SaveAsync(Employee employee)
         {
             if (!CheckDateOfBirth(employee))
-                return new EmployeeResponse("Wrong date of birth");
+                return new EmployeeResponse(messages.checkDateOfBirthErrorMessage);
 
             try
             {
@@ -92,7 +93,7 @@ namespace LeaveManagement.Services
                 await _unitOfWork.EmployeeRepository.Delete(id);
                 await _unitOfWork.SaveAsync();
 
-                return new EmployeeResponse(existingEmployee);
+                return new EmployeeResponse("Employee deleted successfully");
             }
             catch (Exception ex)
             {

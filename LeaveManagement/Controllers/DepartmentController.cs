@@ -10,24 +10,24 @@ using LeaveManagement.Models;
 using LeaveManagement.Persistent;
 using LeaveManagement.Models.Repository;
 using LeaveManagement.Interfaces;
+using LeaveManagement.Interfaces.Services;
 
 namespace LeaveManagement.Controllers
 {
     public class DepartmentController : Controller
     {
-        //private readonly AppDbContext _context;
-        //private readonly IRepository<Department, int> _departmentRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public DepartmentController(IUnitOfWork unitOfWork)
+        private readonly IDepartmentService _departmentService;
+
+        public DepartmentController(IDepartmentService departmentService)
         {
-            _unitOfWork = unitOfWork;
+            _departmentService = departmentService;
         }
 
         // GET: Department
         public async Task<IActionResult> Index()
         {
-            return View(await _unitOfWork.DepartmentRepositoty.GetAll());
+            return View(await _departmentService.ListAsync());
         }
 
         
@@ -47,9 +47,11 @@ namespace LeaveManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _unitOfWork.DepartmentRepositoty.Insert(department);
-                await _unitOfWork.SaveAsync();
-                return RedirectToAction(nameof(Index));
+                var result = await _departmentService.SaveAsync(department);
+                if (result.Success)
+                    return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", result.Message);
+                return View();
             }
             return View(department);
         }
@@ -60,16 +62,7 @@ namespace LeaveManagement.Controllers
         // GET: Department/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var department = await _unitOfWork.DepartmentRepositoty.GetById((int)id);
-            if (department == null)
-            {
-                return NotFound();
-            }
+            var department = await _departmentService.ListById((int)id);
 
             return View(department);
         }
@@ -79,11 +72,9 @@ namespace LeaveManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _unitOfWork.DepartmentRepositoty.Delete(id);
-
-
-            await _unitOfWork.SaveAsync();
+            await _departmentService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
+
         }
 
         
