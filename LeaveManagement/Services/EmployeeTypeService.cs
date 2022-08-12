@@ -42,13 +42,10 @@ namespace LeaveManagement.Services
             return employeeType;
         }
 
-        public async Task<EmployeeTypeResponse> ListById(int id)
+        public async Task<EmployeeType> ListById(int id)
         {
             var employeeType = await _unitOfWork.EmployeeTypeRepository.GetById(id);
-            if (employeeType == null)
-                return new EmployeeTypeResponse("Employee with ID doesn't exist");
-
-            return new EmployeeTypeResponse(employeeType);
+            return employeeType;
         }
 
         public async Task<EmployeeTypeResponse> SaveAsync(EmployeeType employeeType)
@@ -72,10 +69,12 @@ namespace LeaveManagement.Services
             if (employee == null)
                 return new EmployeeTypeResponse("Employee with ID doesn't exist");
 
+            employee.EmployeeTypeName = employeeType.EmployeeTypeName;
+
 
             try
             {
-                await _unitOfWork.EmployeeTypeRepository.Update(employeeType);
+                
                 await _unitOfWork.SaveAsync();
 
                 return new EmployeeTypeResponse(employeeType);

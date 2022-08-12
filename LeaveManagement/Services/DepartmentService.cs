@@ -67,9 +67,11 @@ namespace LeaveManagement.Services
             if (getDepartment == null)
                 return new DepartmentResponse("Department doesn't exist");
 
+            getDepartment.DepartmentName = department.DepartmentName;
+
             try
             {
-                await _unitOfWork.DepartmentRepositoty.Update(department);
+                
                 await _unitOfWork.SaveAsync();
 
                 return new DepartmentResponse(department);

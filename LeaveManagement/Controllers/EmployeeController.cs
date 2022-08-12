@@ -92,8 +92,53 @@ namespace LeaveManagement.Controllers
             return View(employee);
         }
 
-        
 
+        // GET: Employee/Edit
+        public async Task<IActionResult> Edit(int? id)
+        {
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var employeeRequest = await _employeeService.ListById((int)id);
+            if (employeeRequest == null)
+            {
+                return NotFound();
+            }
+            PopulateDepartment();
+            PopulateEmployeeType();
+            return View(employeeRequest);
+        }
+
+
+        // POST: Employee/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,FirstName,LastName,DepartmentId,DateOfBirth,EmployeeTypeId")] Employee employee)
+        {
+            if (id != employee.EmployeeId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                var result = await _employeeService.UpdateAsync(id, employee);
+                if (result.Success)
+                    return RedirectToAction(nameof(Index));
+
+                ModelState.AddModelError("", result.Message);
+                PopulateDepartment();
+                PopulateEmployeeType();
+                return View();
+
+            }
+            return View(employee);
+        }
 
         // GET: Employee/Delete/5
         public async Task<IActionResult> Delete(int? id)

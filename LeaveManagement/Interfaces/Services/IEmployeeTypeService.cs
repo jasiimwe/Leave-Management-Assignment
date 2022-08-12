@@ -7,7 +7,7 @@ namespace LeaveManagement.Interfaces.Services
     public interface IEmployeeTypeService
     {
         Task<IEnumerable<EmployeeType>> ListAsync();
-        Task<EmployeeTypeResponse> ListById(int id);
+        Task<EmployeeType> ListById(int id);
         Task<EmployeeTypeResponse> SaveAsync(EmployeeType employeeType);
         Task<EmployeeTypeResponse> UpdateAsync(int id, EmployeeType employeeType);
         Task<EmployeeTypeResponse> DeleteAsync(int id);

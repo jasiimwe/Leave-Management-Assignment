@@ -11,6 +11,7 @@ using LeaveManagement.Persistent;
 using LeaveManagement.Models.Repository;
 using LeaveManagement.Interfaces;
 using LeaveManagement.Interfaces.Services;
+using LeaveManagement.Services;
 
 namespace LeaveManagement.Controllers
 {
@@ -60,9 +61,54 @@ namespace LeaveManagement.Controllers
             return View(department);
         }
 
-       
 
-        
+        // GET: Department/Edit
+        public async Task<IActionResult> Edit(int? id)
+        {
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var department = await _departmentService.ListById((int)id);
+            if (department == null)
+            {
+                return NotFound();
+            }
+            
+            return View(department);
+        }
+
+
+        // POST: Department/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("DepartmentId, DepartmentName")] Department department)
+        {
+            if (id != department.DepartmentId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                var result = await _departmentService.UpdateAsync(id, department);
+                if (result.Success)
+                    return RedirectToAction(nameof(Index));
+
+                ModelState.AddModelError("", result.Message);
+                return View();
+
+            }
+            return View(department);
+        }
+
+
+
+
         // GET: Department/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {

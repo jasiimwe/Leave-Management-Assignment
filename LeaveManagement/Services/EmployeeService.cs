@@ -68,9 +68,16 @@ namespace LeaveManagement.Services
                 return new EmployeeResponse("Employee Not found");
             }
 
+            existingEmployee.FirstName = employee.FirstName;
+            existingEmployee.LastName = employee.LastName;
+            existingEmployee.DepartmentId = employee.DepartmentId;
+            existingEmployee.EmployeeTypeId = employee.EmployeeTypeId;
+            existingEmployee.DateOfBirth = employee.DateOfBirth;
+            
+
             try
             {
-                await _unitOfWork.EmployeeRepository.Update(employee);
+                
                 await _unitOfWork.SaveAsync();
 
                 return new EmployeeResponse(existingEmployee);

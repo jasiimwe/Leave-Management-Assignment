@@ -42,7 +42,7 @@ namespace LeaveManagement.Models.Repository
 
         public async Task Update(LeaveRequest entity)
         {
-            _context.Entry(entity).State = EntityState.Modified;
+            _context.LeaveRequest.Update(entity);
         }
 
        

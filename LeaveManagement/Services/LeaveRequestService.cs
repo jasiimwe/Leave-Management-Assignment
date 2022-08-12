@@ -178,25 +178,14 @@ namespace LeaveManagement.Services
                 return new LeaveRequestResponse("Leave Request doesn't exist");
 
 
-            if (!StartDateNotLessThanEndDate(leaveRequest))
-                return new LeaveRequestResponse(message.startDateNotLessThanEndDateErrorMessage);
-
-            if (!await LeaveRequestHasOverlapAsync(leaveRequest))
-                return new LeaveRequestResponse(message.leaveRequestHasOverlapAsyncErrorMessagae);
-
-            if (!await LeaveRequestHasOverlapInDepartmentAsync(leaveRequest))
-                return new LeaveRequestResponse(message.leaveRequestHasOverlapInDepartmentAsyncErrorMessage);
-
-            if (!await CheckLastLeaveLessThanThirtyDays(leaveRequest))
-                return new LeaveRequestResponse(message.checkLastLeaveLessThanThirtyDaysErorrMessage);
-
-            if (!await CheckLeaveDays(leaveRequest))
-                return new LeaveRequestResponse(message.checkLeaveDaysErrorMessage);
-
+            existingLeaveRequest.EmployeeId = leaveRequest.EmployeeId;
+            existingLeaveRequest.LeaveStartDate = leaveRequest.LeaveStartDate;
+            existingLeaveRequest.LeaveEndDate = leaveRequest.LeaveEndDate;
+            existingLeaveRequest.ReasonForLeave = leaveRequest.ReasonForLeave;
 
             try
             {
-                await _unitOfWork.LeaveRepository.Update(leaveRequest);
+                
                 await _unitOfWork.SaveAsync();
 
                 return new LeaveRequestResponse(existingLeaveRequest);

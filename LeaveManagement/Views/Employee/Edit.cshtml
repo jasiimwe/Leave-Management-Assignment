@@ -25,7 +25,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="DepartmentId" class="control-label"></label>
-                <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.DepartmentId"></select>
+                <select asp-for="DepartmentId" class="form-control" asp-items="@ViewBag.Department"></select>
                 <span asp-validation-for="DepartmentId" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -35,7 +35,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="EmployeeTypeId" class="control-label"></label>
-                <select asp-for="EmployeeTypeId" class="form-control" asp-items="ViewBag.EmployeeTypeId"></select>
+                <select asp-for="EmployeeTypeId" class="form-control" asp-items="@ViewBag.EmployeeType"></select>
                 <span asp-validation-for="EmployeeTypeId" class="text-danger"></span>
             </div>
             <div class="form-group">

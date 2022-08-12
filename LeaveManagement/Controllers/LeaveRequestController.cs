@@ -104,11 +104,12 @@ namespace LeaveManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("LeaveRequestId,EmployeeId,LeaveStartDate,LeaveEndDate,ReasonForLeave")] LeaveRequest leaveRequest)
         {
+            
             if (id != leaveRequest.LeaveRequestId)
             {
                 return NotFound();
             }
-
+            
             if (ModelState.IsValid)
             {
                 var result = await _leaveRequestService.UpdateAsync(id, leaveRequest);

@@ -11,6 +11,7 @@ using LeaveManagement.Persistent;
 using LeaveManagement.Models.Repository;
 using LeaveManagement.Interfaces;
 using LeaveManagement.Interfaces.Services;
+using LeaveManagement.Services;
 
 namespace LeaveManagement.Controllers
 {
@@ -87,7 +88,32 @@ namespace LeaveManagement.Controllers
             return View(employeeType);
         }
 
-        
+        // POST: EmployeeType/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("EmployeeTypeId, EmployeeTypeName")] EmployeeType employeeType)
+        {
+            if (id != employeeType.EmployeeTypeId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                var result = await _employeeTypeService.UpdateAsync(id, employeeType);
+                if (result.Success)
+                    return RedirectToAction(nameof(Index));
+
+                ModelState.AddModelError("", result.Message);
+                return View();
+
+            }
+            return View(employeeType);
+        }
+
+
         // GET: EmployeeType/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {

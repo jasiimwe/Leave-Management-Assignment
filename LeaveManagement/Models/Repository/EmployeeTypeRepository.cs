@@ -35,7 +35,7 @@ namespace LeaveManagement.Models.Repository
 
         public async Task Update(EmployeeType entity)
         {
-            _context.Entry(entity).State = EntityState.Modified;
+            _context.EmployeeType.Update(entity);
 
         }
 
