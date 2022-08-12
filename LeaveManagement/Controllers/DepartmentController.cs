@@ -48,10 +48,14 @@ namespace LeaveManagement.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _departmentService.SaveAsync(department);
-                if (result.Success)
-                    return RedirectToAction(nameof(Index));
-                ModelState.AddModelError("", result.Message);
-                return View();
+                if (!result.Success)
+                {
+                    ModelState.AddModelError("", result.Message);
+                    return View();
+                }
+
+                return RedirectToAction(nameof(Index));
+
             }
             return View(department);
         }

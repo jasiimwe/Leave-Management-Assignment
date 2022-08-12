@@ -47,9 +47,7 @@ namespace LeaveManagement.Services
 
         public async Task<DepartmentResponse> SaveAsync(Department department)
         {
-            var getDepartment = await _unitOfWork.DepartmentRepositoty.GetById(department.DepartmentId);
-            if (getDepartment != null)
-                return new DepartmentResponse("Department already exists");
+            
 
             try
             {
