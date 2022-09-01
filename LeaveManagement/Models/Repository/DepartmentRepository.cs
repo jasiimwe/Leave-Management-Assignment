@@ -1,47 +1,44 @@
 ﻿using System;
+using LeaveManagement.Interfaces.Repositories;
 using LeaveManagement.Persistent;
 using Microsoft.EntityFrameworkCore;
 
 namespace LeaveManagement.Models.Repository
 {
-    public class DepartmentRepository : IRepository<Department, int>
+    public class DepartmentRepository : BaseRepository, IDepartmentRepository
     {
-        private readonly AppDbContext _context;
 
-        public DepartmentRepository(AppDbContext context) => _context = context;
-
-
-
-
-        public async Task<IEnumerable<Department>> GetAll() => await _context.Department.ToListAsync();
-
-        public async Task<Department> GetById(int id) => await _context.Department.FindAsync(id);
-        
-
-        public async Task<Department> Insert(Department entity)
+        public DepartmentRepository(AppDbContext context) : base(context)
         {
-            await _context.AddAsync(entity);
-            return entity;
+          
         }
 
-        public async Task Delete(int id)
+        public void Delete(Department entity)
         {
-            var department = await _context.Department.FirstOrDefaultAsync(b => b.DepartmentId == id);
-            if(department != null)
-            {
-                _context.Remove(department);
-            }
+            _context.Department.Remove(entity);
         }
 
-        public async Task Update(Department entity)
+        public async Task<IEnumerable<Department>> GetAll()
+        {
+            var department = await _context.Department.AsNoTracking().ToListAsync();
+            return department;
+        }
+
+        public async Task<Department> GetById(int id)
+        {
+            var getDepartment = await _context.Department.FindAsync(id);
+            return getDepartment;
+        }
+
+        public async Task InsertAsync(Department entity)
+        {
+            await _context.Department.AddAsync(entity);
+        }
+
+        public void Update(Department entity)
         {
             _context.Department.Update(entity);
-
         }
-
-
-
-
     }
 }
 

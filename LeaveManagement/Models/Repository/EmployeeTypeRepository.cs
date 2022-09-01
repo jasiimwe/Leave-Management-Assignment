@@ -1,45 +1,42 @@
 ﻿using System;
+using LeaveManagement.Interfaces.Repositories;
 using LeaveManagement.Persistent;
 using Microsoft.EntityFrameworkCore;
 
 namespace LeaveManagement.Models.Repository
 {
-    public class EmployeeTypeRepository : IRepository<EmployeeType, int>
+    public class EmployeeTypeRepository : BaseRepository, IEmployeeTypeRepository
     {
-        private readonly AppDbContext _context;
-        public EmployeeTypeRepository(AppDbContext context)
+
+        public EmployeeTypeRepository(AppDbContext context):base(context)
         {
-            _context = context;
+
+        }
+        public void Delete(EmployeeType entity)
+        {
+            _context.EmployeeType.Remove(entity);
         }
 
-        public async Task Delete(int id)
+        public async Task<IEnumerable<EmployeeType>> GetAll()
         {
-            var employeeType = await _context.EmployeeType.FirstOrDefaultAsync(b => b.EmployeeTypeId == id);
-            if (employeeType != null)
-            {
-                _context.Remove(employeeType);
-            }
+            return await _context.EmployeeType.AsNoTracking().ToListAsync();
         }
 
-        public async Task<IEnumerable<EmployeeType>> GetAll() => await _context.EmployeeType.ToListAsync();
-
-
-        public async Task<EmployeeType> GetById(int id) => await _context.EmployeeType.FirstOrDefaultAsync(b => b.EmployeeTypeId == id);
-        
-
-        public async Task<EmployeeType> Insert(EmployeeType entity)
+        public async Task<EmployeeType> GetById(int id)
         {
-           await _context.AddAsync(entity);
-            return entity;
+            return await _context.EmployeeType.FindAsync(id);
         }
 
-        public async Task Update(EmployeeType entity)
+        public async Task InsertAsync(EmployeeType entity)
+        {
+            await _context.EmployeeType.AddAsync(entity);
+        }
+
+        public void Update(EmployeeType entity)
         {
             _context.EmployeeType.Update(entity);
-
         }
-
-
     }
+
 }
 

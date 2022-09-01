@@ -37,10 +37,10 @@ namespace LeaveManagement.Services
 
 
         #region Service Implementation
-        public Task<IEnumerable<Employee>> ListAsync()
+        public async Task<IEnumerable<Employee>> ListAsync()
         {
-            var employee = _unitOfWork.EmployeeRepository.GetAll();
-            return employee;
+            return await _unitOfWork.employeeRepository.GetAll();
+            
         }
 
         public async Task<EmployeeResponse> SaveAsync(Employee employee)
@@ -50,8 +50,8 @@ namespace LeaveManagement.Services
 
             try
             {
-                await _unitOfWork.EmployeeRepository.Insert(employee);
-                await _unitOfWork.SaveAsync();
+                await _unitOfWork.employeeRepository.InsertAsync(employee);
+                await _unitOfWork.CompleteAsync();
 
                 return new EmployeeResponse(employee);
             }catch(Exception ex)
@@ -62,7 +62,7 @@ namespace LeaveManagement.Services
 
         public async Task<EmployeeResponse> UpdateAsync(int id, Employee employee)
         {
-            var existingEmployee = await _unitOfWork.EmployeeRepository.GetById(id);
+            var existingEmployee = await _unitOfWork.employeeRepository.GetById(id);
             if (existingEmployee == null)
             {
                 return new EmployeeResponse("Employee Not found");
@@ -78,7 +78,7 @@ namespace LeaveManagement.Services
             try
             {
                 
-                await _unitOfWork.SaveAsync();
+                await _unitOfWork.CompleteAsync();
 
                 return new EmployeeResponse(existingEmployee);
             }catch(Exception ex)
@@ -90,15 +90,15 @@ namespace LeaveManagement.Services
 
         public async Task<EmployeeResponse> DeleteAsync(int id)
         {
-            var existingEmployee = await _unitOfWork.EmployeeRepository.GetById(id);
+            var existingEmployee = await _unitOfWork.employeeRepository.GetById(id);
 
             if (existingEmployee == null)
                 return new EmployeeResponse("Emplopyee not found.");
 
             try
             {
-                await _unitOfWork.EmployeeRepository.Delete(id);
-                await _unitOfWork.SaveAsync();
+                _unitOfWork.employeeRepository.Delete(existingEmployee);
+                await _unitOfWork.CompleteAsync();
 
                 return new EmployeeResponse("Employee deleted successfully");
             }
@@ -111,7 +111,7 @@ namespace LeaveManagement.Services
 
         public Task<Employee> ListById(int id)
         {
-            var employee = _unitOfWork.EmployeeRepository.GetById(id);
+            var employee = _unitOfWork.employeeRepository.GetById(id);
             return employee;
         }
         #endregion

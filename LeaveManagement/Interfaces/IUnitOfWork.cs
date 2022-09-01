@@ -1,4 +1,5 @@
 ﻿using System;
+using LeaveManagement.Interfaces.Repositories;
 using LeaveManagement.Models;
 using LeaveManagement.Models.Repository;
 
@@ -6,14 +7,13 @@ namespace LeaveManagement.Interfaces
 {
     public interface IUnitOfWork
     {
-        IRepository<Department, int> DepartmentRepositoty { get; }
-        IRepository<EmployeeType, int> EmployeeTypeRepository { get; }
-        IRepository<Employee, int> EmployeeRepository { get; }
-        //IRepository<LeaveRequest, int> LeaveRepository { get;  }
-        ILeaveRepository LeaveRepository {get; }
+        IDepartmentRepository departmentRepositoty { get; }
+        IEmployeeRepository employeeRepository { get; }
+        IEmployeeTypeRepository employeeTypeRepository { get; }
+        ILeaveRequestRepository leaveRequestRepository { get; }
 
-        Task<bool> SaveAsync();
-        
+        Task CompleteAsync();
+
     }
 }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using LeaveManagement.Communication;
 using LeaveManagement.Interfaces;
+using LeaveManagement.Interfaces.Repositories;
 using LeaveManagement.Interfaces.Services;
 using LeaveManagement.Models;
 
@@ -9,6 +10,7 @@ namespace LeaveManagement.Services
     public class DepartmentService : IDepartmentService
     {
         private readonly IUnitOfWork _unitOfWork;
+        
         public DepartmentService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -16,14 +18,14 @@ namespace LeaveManagement.Services
 
         public async Task<DepartmentResponse> DeleteAsync(int id)
         {
-            var getDepartment = await _unitOfWork.DepartmentRepositoty.GetById(id);
+            var getDepartment = await _unitOfWork.departmentRepositoty.GetById(id);
             if (getDepartment == null)
                 return new DepartmentResponse("Department doesn't exist");
 
             try
             {
-                await _unitOfWork.DepartmentRepositoty.Delete(id);
-                await _unitOfWork.SaveAsync();
+                _unitOfWork.departmentRepositoty.Delete(getDepartment);
+                await _unitOfWork.CompleteAsync();
 
                 return new DepartmentResponse("succesfully deleted department");
             }catch(Exception ex)
@@ -34,14 +36,14 @@ namespace LeaveManagement.Services
 
         public async Task<IEnumerable<Department>> ListAsync()
         {
-            var department = await _unitOfWork.DepartmentRepositoty.GetAll();
-            return department;
+            return await _unitOfWork.departmentRepositoty.GetAll();
+            
         }
 
         public async Task<Department> ListById(int id)
         {
 
-            var department = await _unitOfWork.DepartmentRepositoty.GetById(id);
+            var department = await _unitOfWork.departmentRepositoty.GetById(id);
             return department;
         }
 
@@ -51,8 +53,8 @@ namespace LeaveManagement.Services
 
             try
             {
-                await _unitOfWork.DepartmentRepositoty.Insert(department);
-                await _unitOfWork.SaveAsync();
+                await _unitOfWork.departmentRepositoty.InsertAsync(department);
+                await _unitOfWork.CompleteAsync();
 
                 return new DepartmentResponse(department);
             }catch(Exception ex)
@@ -63,7 +65,7 @@ namespace LeaveManagement.Services
 
         public async Task<DepartmentResponse> UpdateAsync(int id, Department department)
         {
-            var getDepartment = await _unitOfWork.DepartmentRepositoty.GetById(id);
+            var getDepartment = await _unitOfWork.departmentRepositoty.GetById(id);
             if (getDepartment == null)
                 return new DepartmentResponse("Department doesn't exist");
 
@@ -72,7 +74,7 @@ namespace LeaveManagement.Services
             try
             {
                 
-                await _unitOfWork.SaveAsync();
+                await _unitOfWork.CompleteAsync();
 
                 return new DepartmentResponse(department);
             }catch(Exception ex)

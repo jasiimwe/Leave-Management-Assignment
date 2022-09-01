@@ -16,14 +16,14 @@ namespace LeaveManagement.Services
 
         public async Task<EmployeeTypeResponse> DeleteAsync(int id)
         {
-            var employee = await _unitOfWork.EmployeeTypeRepository.GetById(id);
-            if (employee == null)
+            var employeeType = await _unitOfWork.employeeTypeRepository.GetById(id);
+            if (employeeType == null)
                 return new EmployeeTypeResponse("Employee with ID doesn't exist");
 
             try
             {
-                await _unitOfWork.EmployeeTypeRepository.Delete(id);
-                await _unitOfWork.SaveAsync();
+                _unitOfWork.employeeTypeRepository.Delete(employeeType);
+                await _unitOfWork.CompleteAsync();
 
                 return new EmployeeTypeResponse("Succesfully Deleted record");
             }
@@ -38,14 +38,14 @@ namespace LeaveManagement.Services
         public async Task<IEnumerable<EmployeeType>> ListAsync()
         {
 
-            var employeeType = await _unitOfWork.EmployeeTypeRepository.GetAll();
-            return employeeType;
+            return await _unitOfWork.employeeTypeRepository.GetAll();
+            
         }
 
         public async Task<EmployeeType> ListById(int id)
         {
-            var employeeType = await _unitOfWork.EmployeeTypeRepository.GetById(id);
-            return employeeType;
+            return await _unitOfWork.employeeTypeRepository.GetById(id);
+            
         }
 
         public async Task<EmployeeTypeResponse> SaveAsync(EmployeeType employeeType)
@@ -53,8 +53,8 @@ namespace LeaveManagement.Services
 
             try
             {
-                await _unitOfWork.EmployeeTypeRepository.Insert(employeeType);
-                await _unitOfWork.SaveAsync();
+                await _unitOfWork.employeeTypeRepository.InsertAsync(employeeType);
+                await _unitOfWork.CompleteAsync();
 
                 return new EmployeeTypeResponse(employeeType);
             }catch(Exception ex)
@@ -65,7 +65,7 @@ namespace LeaveManagement.Services
 
         public async Task<EmployeeTypeResponse> UpdateAsync(int id, EmployeeType employeeType)
         {
-            var employee = await _unitOfWork.EmployeeTypeRepository.GetById(id);
+            var employee = await _unitOfWork.employeeTypeRepository.GetById(id);
             if (employee == null)
                 return new EmployeeTypeResponse("Employee with ID doesn't exist");
 
@@ -75,7 +75,7 @@ namespace LeaveManagement.Services
             try
             {
                 
-                await _unitOfWork.SaveAsync();
+                await _unitOfWork.CompleteAsync();
 
                 return new EmployeeTypeResponse(employeeType);
             }

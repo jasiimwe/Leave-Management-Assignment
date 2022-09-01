@@ -17,12 +17,12 @@ namespace LeaveManagement.Controllers
 {
     public class LeaveRequestController : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IEmployeeService _employeeService;
         private readonly ILeaveRequestService _leaveRequestService;
 
-        public LeaveRequestController(ILeaveRequestService leaveRequest, IUnitOfWork unitOfWork)
+        public LeaveRequestController(ILeaveRequestService leaveRequest, IEmployeeService employeeService)
         {
-            _unitOfWork = unitOfWork;
+            _employeeService = employeeService;
             _leaveRequestService = leaveRequest;
         }
 
@@ -153,7 +153,7 @@ namespace LeaveManagement.Controllers
 
         public async void PopulateEmployee()
         {
-            var EmployeeCollection = await _unitOfWork.EmployeeRepository.GetAll();
+            var EmployeeCollection = await _employeeService.ListAsync();
             ViewBag.Employee = EmployeeCollection.Select(item => new SelectListItem
             {
                 Text = item.FirstName,

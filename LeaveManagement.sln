@@ -5,6 +5,8 @@ VisualStudioVersion = 25.0.1700.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveManagement", "LeaveManagement\LeaveManagement.csproj", "{175CDCB3-68D5-4A1E-8A80-D18E74F01754}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveManagementTest", "LeaveManagementTest\LeaveManagementTest.csproj", "{5426F630-98B9-464B-879B-6A823F7DB3DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{175CDCB3-68D5-4A1E-8A80-D18E74F01754}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{175CDCB3-68D5-4A1E-8A80-D18E74F01754}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{175CDCB3-68D5-4A1E-8A80-D18E74F01754}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5426F630-98B9-464B-879B-6A823F7DB3DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5426F630-98B9-464B-879B-6A823F7DB3DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5426F630-98B9-464B-879B-6A823F7DB3DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5426F630-98B9-464B-879B-6A823F7DB3DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

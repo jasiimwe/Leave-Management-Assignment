@@ -1,4 +1,5 @@
 ﻿using LeaveManagement.Interfaces;
+using LeaveManagement.Interfaces.Repositories;
 using LeaveManagement.Interfaces.Services;
 using LeaveManagement.Models;
 using LeaveManagement.Models.Repository;
@@ -11,6 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IEmployeeTypeRepository, EmployeeTypeRepository>();
+builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+builder.Services.AddScoped<ILeaveRequestRepository, LeaveRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<ILeaveRequestService, LeaveRequestService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();

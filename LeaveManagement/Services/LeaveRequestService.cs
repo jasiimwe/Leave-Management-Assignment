@@ -40,7 +40,7 @@ namespace LeaveManagement.Services
         //Lookup overlapping dates
         protected async Task<bool> LeaveRequestHasOverlapAsync(LeaveRequest leaveRequest)
         {
-            var getLeaveRequests = await _unitOfWork.LeaveRepository.GetAllLeaveRequestForEmployee(leaveRequest);
+            var getLeaveRequests = await _unitOfWork.leaveRequestRepository.GetAllLeaveRequestForEmployee(leaveRequest);
             foreach(var c in getLeaveRequests)
             {
                 var isOverlap = LeaveRequestValidation.HasOverlap(c.LeaveStartDate, c.LeaveEndDate, leaveRequest.LeaveStartDate, leaveRequest.LeaveEndDate);
@@ -54,9 +54,9 @@ namespace LeaveManagement.Services
         //Lookup overlapping dates within Department
         protected async Task<bool> LeaveRequestHasOverlapInDepartmentAsync(LeaveRequest leaveRequest)
         {
-            var getLeaveRequests = await _unitOfWork.LeaveRepository.GetAll();
+            var getLeaveRequests = await _unitOfWork.leaveRequestRepository.GetAll();
             
-            var getEmployee = await _unitOfWork.EmployeeRepository.GetById(leaveRequest.EmployeeId);
+            var getEmployee = await _unitOfWork.employeeRepository.GetById(leaveRequest.EmployeeId);
 
             foreach(var c in getLeaveRequests.Where(x=>x.Employee.Department == getEmployee.Department))
             {
@@ -72,7 +72,7 @@ namespace LeaveManagement.Services
         //Lookup last leave request to be less than 30 days
         protected async Task<bool> CheckLastLeaveLessThanThirtyDays(LeaveRequest leaveRequest)
         {
-            var getLeaveRequests = await _unitOfWork.LeaveRepository.GetAllLeaveRequestForEmployee(leaveRequest);
+            var getLeaveRequests = await _unitOfWork.leaveRequestRepository.GetAllLeaveRequestForEmployee(leaveRequest);
 
             var lastDate = getLeaveRequests.LastOrDefault();
 
@@ -89,7 +89,7 @@ namespace LeaveManagement.Services
         protected async Task<bool> CheckLeaveDays(LeaveRequest leaveRequest)
         {
             var requestLeaveDays = LeaveRequestValidation.NumberOfLeaveDaysExcludingWeekends(leaveRequest.LeaveStartDate, leaveRequest.LeaveEndDate);
-            var getEmployee = await _unitOfWork.EmployeeRepository.GetById(leaveRequest.EmployeeId);
+            var getEmployee = await _unitOfWork.employeeRepository.GetById(leaveRequest.EmployeeId);
             if(getEmployee.EmployeeType.EmployeeTypeName == "Manager")
             {
                 if (requestLeaveDays > 30) return false;
@@ -107,15 +107,15 @@ namespace LeaveManagement.Services
         #region Service Implementation
         public async Task<LeaveRequestResponse> DeleteAsync(int id)
         {
-            var existingLeaveRequest = await _unitOfWork.LeaveRepository.GetById(id);
+            var existingLeaveRequest = await _unitOfWork.leaveRequestRepository.GetById(id);
             if (existingLeaveRequest == null)
                 return new LeaveRequestResponse("Leave Request doesn't exist");
             
 
             try
             {
-                await _unitOfWork.LeaveRepository.Delete(id);
-                await _unitOfWork.SaveAsync();
+                _unitOfWork.leaveRequestRepository.Delete(existingLeaveRequest);
+                await _unitOfWork.CompleteAsync();
 
                 return new LeaveRequestResponse("Successfully deleted Leave Request");
             }
@@ -127,14 +127,14 @@ namespace LeaveManagement.Services
 
         public async Task<IEnumerable<LeaveRequest>> ListAsync()
         {
-            var leaveRequest = await _unitOfWork.LeaveRepository.GetAll();
-            return leaveRequest;
+            return await _unitOfWork.leaveRequestRepository.GetAll();
+            
         }
 
         public async Task<LeaveRequest> ListById(int id)
         {
-            var leaveRequest = await _unitOfWork.LeaveRepository.GetById(id);
-            return leaveRequest;
+            return await _unitOfWork.leaveRequestRepository.GetById(id);
+            
 
         }
 
@@ -161,8 +161,8 @@ namespace LeaveManagement.Services
 
             try
             {
-                await _unitOfWork.LeaveRepository.Insert(leaveRequest);
-                await _unitOfWork.SaveAsync();
+                await _unitOfWork.leaveRequestRepository.InsertAsync(leaveRequest);
+                await _unitOfWork.CompleteAsync();
 
                 return new LeaveRequestResponse(leaveRequest);
             }catch(Exception ex)
@@ -173,7 +173,7 @@ namespace LeaveManagement.Services
 
         public async Task<LeaveRequestResponse> UpdateAsync(int id, LeaveRequest leaveRequest)
         {
-            var existingLeaveRequest = await _unitOfWork.LeaveRepository.GetById(id);
+            var existingLeaveRequest = await _unitOfWork.leaveRequestRepository.GetById(id);
             if (existingLeaveRequest == null)
                 return new LeaveRequestResponse("Leave Request doesn't exist");
 
@@ -186,7 +186,7 @@ namespace LeaveManagement.Services
             try
             {
                 
-                await _unitOfWork.SaveAsync();
+                await _unitOfWork.CompleteAsync();
 
                 return new LeaveRequestResponse(existingLeaveRequest);
             }catch(Exception ex)

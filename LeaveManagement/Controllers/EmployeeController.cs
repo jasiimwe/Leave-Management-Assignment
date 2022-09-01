@@ -20,19 +20,17 @@ namespace LeaveManagement.Controllers
     {
         
         private readonly IEmployeeService _employeeService;
-        //private readonly IDepartmentService _departmentService;
-        //private readonly IEmployeeTypeService _employeeTypeService;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IRepository<Employee, int> _employeeRepository;
-        private readonly ModelStateDictionary _modelStateDictionery;
-
+        private readonly IDepartmentService _departmentService;
+        private readonly IEmployeeTypeService _employeeTypeService;
         
-
-        public EmployeeController(IEmployeeService employeeService, IUnitOfWork unitOfWork)
+        
+        public EmployeeController(IEmployeeService employeeService, IDepartmentService departmentService, IEmployeeTypeService employeeTypeService)
         {
 
             _employeeService = employeeService;
-            _unitOfWork = unitOfWork;
+            _departmentService = departmentService;
+            _employeeTypeService = employeeTypeService;
+            
         }
 
         // GET: Employee
@@ -51,7 +49,7 @@ namespace LeaveManagement.Controllers
                 return NotFound();
             }
 
-            var employee = await _unitOfWork.EmployeeRepository.GetById((int)id);
+            var employee = await _employeeService.ListById((int)id);
             if (employee == null)
             {
                 return NotFound();
@@ -171,7 +169,7 @@ namespace LeaveManagement.Controllers
         [NonAction]
         public async void PopulateDepartment()
         {
-            var DepartmentCollection = await _unitOfWork.DepartmentRepositoty.GetAll();
+            var DepartmentCollection = await _departmentService.ListAsync();
             ViewBag.Department = DepartmentCollection.Select(item => new SelectListItem { Text = item.DepartmentName,
             Value = item.DepartmentId.ToString() });
         }
@@ -179,7 +177,7 @@ namespace LeaveManagement.Controllers
         [NonAction]
         public async void PopulateEmployeeType()
         {
-            var employeeType = await _unitOfWork.EmployeeTypeRepository.GetAll();
+            var employeeType = await _employeeTypeService.ListAsync();
             ViewBag.EmployeeType = employeeType.Select(item => new SelectListItem { Text = item.EmployeeTypeName,
                 Value = item.EmployeeTypeId.ToString()});
         }

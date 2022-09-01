@@ -12,6 +12,10 @@ tarballs/
 test-results/
 
 *.db
+*.db-shm
+*.db-wal
+
+Migrations/
 
 # Mac bundle stuff
 *.dmg
