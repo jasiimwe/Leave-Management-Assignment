@@ -46,19 +46,26 @@ namespace LeaveManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("DepartmentId,DepartmentName")] Department department)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var result = await _departmentService.SaveAsync(department);
+                return BadRequest(ModelState);
+            }
+            else
+            {
+                await _departmentService.SaveAsync(department);
+                /*
                 if (!result.Success)
                 {
                     ModelState.AddModelError("", result.Message);
                     return View();
                 }
+                */
 
-                return RedirectToAction(nameof(Index));
+                
 
             }
-            return View(department);
+
+            return RedirectToAction(nameof(Index));
         }
 
 
