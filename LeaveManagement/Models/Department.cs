@@ -11,6 +11,7 @@ namespace LeaveManagement.Models
         public int DepartmentId { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
+        [Required(ErrorMessage = "Empty Department name")]
         public string? DepartmentName { get; set; }
 
 
